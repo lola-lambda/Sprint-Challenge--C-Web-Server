@@ -28,15 +28,15 @@ typedef struct urlinfo_t {
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *hostname = strdup(url);
-  char *port;
-  char *path;
+  char *url_cpy = strdup(url);
+  char *hostname = url_cpy;
+  char *port = "80";
+  char *path = "";
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
   /*
     We can parse the input URL by doing the following:
-
     1. Use strchr to find the first backslash in the URL (this is assuming there is no http:// or https:// in the URL).
     2. Set the path pointer to 1 character after the spot returned by strchr.
     3. Overwrite the backslash with a '\0' so that we are no longer considering anything after the backslash.
@@ -45,10 +45,23 @@ urlinfo_t *parse_url(char *url)
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
 
-  ///////////////////
-  // IMPLEMENT ME! //
-  ///////////////////
+  if (strchr(url_cpy, '/')) {
+    path = strchr(url_cpy, '/') + 1;
+    path[-1] = '\0';
+  }
+  
+  if (strchr(url_cpy, ':')) {
+    port = strchr(url_cpy, ':') + 1;
+    port[-1] = '\0';
+  }
 
+  printf("host: %s\n", hostname);
+  printf("port: %s\n", port);
+  printf("path: %s\n", path);
+  
+  urlinfo->hostname = hostname;
+  urlinfo->port = port;
+  urlinfo->path = path;
   return urlinfo;
 }
 
@@ -85,6 +98,7 @@ int main(int argc, char *argv[])
     exit(1);
   }
 
+  parse_url(argv[1]);
   /*
     1. Parse the input URL
     2. Initialize a socket by calling the `get_socket` function from lib.c
