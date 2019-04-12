@@ -28,10 +28,10 @@ typedef struct urlinfo_t {
 urlinfo_t *parse_url(char *url)
 {
   // copy the input URL so as not to mutate the original
-  char *url_cpy = strdup(url);
-  char *hostname = url_cpy;
+  char *hostname;
   char *port = "80";
   char *path = "";
+  char *url_cpy;
 
   urlinfo_t *urlinfo = malloc(sizeof(urlinfo_t));
 
@@ -44,6 +44,19 @@ urlinfo_t *parse_url(char *url)
     5. Set the port pointer to 1 character after the spot returned by strchr.
     6. Overwrite the colon with a '\0' so that we are just left with the hostname.
   */
+  if (strstr(url, "http://"))  {
+    url_cpy = strdup(url + 7);
+  }
+
+  if (strstr(url, "https://"))  {
+    url_cpy = strdup(url + 8);
+  }
+
+  else {
+    url_cpy = strdup(url);
+  }
+
+  hostname = url_cpy;
 
   if (strchr(url_cpy, '/')) {
     path = strchr(url_cpy, '/') + 1;
@@ -54,7 +67,7 @@ urlinfo_t *parse_url(char *url)
     port = strchr(url_cpy, ':') + 1;
     port[-1] = '\0';
   }
-  
+
   urlinfo->hostname = hostname;
   urlinfo->port = port;
   urlinfo->path = path;
@@ -116,6 +129,9 @@ int main(int argc, char *argv[])
   }
 
   close(sockfd);
+  url->hostname = NULL;
+  url->port = NULL;
+  url->path = NULL;
   free(url->hostname);
   free(url->port);
   free(url->path);
@@ -128,6 +144,6 @@ int main(int argc, char *argv[])
     4. Call `recv` in a loop until there is no more data to receive from the server. Print the received response to stdout.
     5. Clean up any allocated memory and open file descriptors.
   */
- 
+
   return 0;
 }
